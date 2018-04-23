@@ -9,6 +9,8 @@ class Tank{
   int size;
   int degrees;
   Turret turret;
+  State state;
+  float direct;
   
   Tank(int x,int y,int s){
     this.x = x;
@@ -22,10 +24,61 @@ class Tank{
     //this.velocity = new PVector();
     this.acceleration = new PVector();
     rotationSpeed = 0.05;
+    state = State.SEARCHING;
+    direct = 0;
+  }
+  void action(){
+    switch(state){
+      case PASSIVE:
+        passive();
+        break;
+      case SEARCHING:
+        searching();
+        break;
+      case FIGHTING:
+        fighting();
+        break;
+      default:
+    }
+  }
+  
+  void passive(){
+    if(turret.degrees != radians(70))
+      rotateTurretLeft();
+    else
+      turnRight();
+      
+  }
+  
+  boolean checkCollision(){
+    if(location.x < width && location.x >0 && location.y < height && location.y >0 && !checkCollisions(this))
+      return false;
+    
+    else
+    return true;
+  }
+  void searching(){
+    
+    if(!checkCollision()){
+     direct = heading;
+      moveForward();
+    }
+    else{
+      if(heading < (direct+radians(160)))
+        turnRight();
+      else{
+        fire();
+      moveForward();
+      print("test");
+      }
+    } 
+      
+  }
+  void fighting(){
   }
   
   void moveForward(){
-    if(!checkCollisions(this)){
+    if(!checkCollision()){
     //velocity = new PVector(cos(heading),sin(heading));
     velocity = PVector.fromAngle(this.heading);
     velocity.mult(10);

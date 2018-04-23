@@ -1,6 +1,8 @@
     ArrayList<Tank> tanks = new ArrayList<Tank>();
     ArrayList<Shot> shots = new ArrayList<Shot>();
     int currentTank;
+    int height = 800;
+    int width = 800;
     
 
   void setup(){
@@ -62,10 +64,12 @@
          tanks.get(currentTank).turnRight();
       else if(key == 'f')
          tanks.get(currentTank).fire();
-         
+      
       
      
     }
+    else
+         tanks.get(currentTank).action();
   } 
   
   void keyPressed(){
@@ -77,6 +81,16 @@
           else
            currentTank = 0;
     }
+    else if(key == '1'){
+      tanks.get(currentTank).state = State.PASSIVE;
+    }
+    else if(key == '2'){
+      tanks.get(currentTank).state = State.SEARCHING;
+    }
+    else if(key == '3'){
+      tanks.get(currentTank).state = State.FIGHTING;
+    }
+      
   }
 
 void draw() {
