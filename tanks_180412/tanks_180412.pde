@@ -302,10 +302,11 @@ void checkForKeys() {
       allTanks[tankInFocus].moveBackward();
     }
     
-    if(!(up || down)) {
+    /*if(!(up || down)) {
        allTanks[tankInFocus].deaccelarate();
-    }
+    }*/
   }
+    allTanks[tankInFocus].action();
 }
 
 void keyPressed() {

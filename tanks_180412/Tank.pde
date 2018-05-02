@@ -280,4 +280,11 @@ class Tank {
         
 
   }
+  
+  void action(){
+    moveForward();
+  }
+  
+  void moveTo(){
+  }
 }
