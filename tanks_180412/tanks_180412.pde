@@ -162,7 +162,7 @@ void checkForCollisionsTanks() {
     allTanks[i].checkEnvironment();
     
     // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
-    for (int j = 0; j < allaHinder.length; j++) {
+    /*for (int j = 0; j < allaHinder.length; j++) {
       allTanks[i].checkCollision(allaHinder[j]);
     }
     
@@ -171,7 +171,7 @@ void checkForCollisionsTanks() {
       if (allTanks[i].getId() != j) {
         allTanks[i].checkCollision(allTanks[j]);
       }
-    }
+    }*/
   }
 }
 
@@ -206,6 +206,7 @@ void displayHomeBaseTeam2() {
 void draw() {
   // Kommentar: flyttat ut en del i egna funktioner istället.
   background(200);
+  ellipse(700,550,20,20);
   
   
   int passedTime = millis() - savedTime;
@@ -302,7 +303,7 @@ void checkForKeys() {
       allTanks[tankInFocus].moveBackward();
     }
     
-    /*if(!(up || down)) {
+   /* if(!(up || down)) {
        allTanks[tankInFocus].deaccelarate();
     }*/
   }
@@ -390,4 +391,7 @@ public void keyTyped() {
   }
   //println(selectedHint);
   
+}
+public void mouseClicked(){
+   allTanks[tankInFocus].setGoal(new PVector(mouseX,mouseY));
 }

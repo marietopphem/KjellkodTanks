@@ -17,6 +17,7 @@ class Tank {
   PVector position = new PVector();
   PVector velocity = new PVector();
   PVector acceleration = new PVector();
+  PVector goal;
   
   // Variable for heading!
   float heading;
@@ -64,6 +65,7 @@ class Tank {
     this.health = 3;// 3 är bra, 2 är mindre bra, 1 är immobilized, 0 är oskadliggjord.
     
     this.ball.setColor(this.team.getColor());
+    goal = new PVector(0,0);
     
   }
   
@@ -135,7 +137,7 @@ class Tank {
     float angle = this.heading; // - PI/2;
     // Polar to cartesian for force vector!
     PVector force = new PVector(cos(angle),sin(angle));
-    force.mult(0.1);
+    force.mult(10);
     applyForce(force); 
     
     updatePosition();
@@ -280,11 +282,35 @@ class Tank {
         
 
   }
-  
-  void action(){
-    moveForward();
+  void setGoal(PVector pos){
+  goal = pos;
   }
   
-  void moveTo(){
+  void action(){
+  
+    moveTo(goal);
+  }
+  
+  void moveTo(PVector pos){
+    if(!(position.x-pos.x <5 && position.x-pos.x >-5 && position.y-pos.y <5 && position.y-pos.y >-5)){
+      float x = pos.x-position.x;
+      float y = pos.y-position.y;
+      
+      float tempHeading = atan(y/x);
+      if(x<0)
+        tempHeading -= PI;
+      println(position.x +" "+ position.y);
+      println(pos.x+" "+pos.y);
+      println(heading);
+      println(tempHeading);
+      if(heading > (tempHeading+radians(1)))
+        turnLeft();
+      else if (heading < (tempHeading-radians(1)))
+        turnRight();
+      else
+      moveForward();
+    }
+    
+    
   }
 }
