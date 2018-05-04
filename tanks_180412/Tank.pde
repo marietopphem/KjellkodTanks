@@ -33,7 +33,7 @@ class Tank {
   
   Turret turret;
   
-  State state = State.Search;
+  State state;
   
   Tank(int id, Team team, PVector startpos, float diameter, CannonBall ball) {
     println("*** NEW TANK(): [" + team.getId()+":"+id+"]");
@@ -68,6 +68,9 @@ class Tank {
     
     this.ball.setColor(this.team.getColor());
     goal = new PVector(0,0);
+    
+    
+    this.state = State.Search;
     
   }
   
