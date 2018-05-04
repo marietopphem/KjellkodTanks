@@ -33,6 +33,8 @@ class Tank {
   
   Turret turret;
   
+  State state = State.Search;
+  
   Tank(int id, Team team, PVector startpos, float diameter, CannonBall ball) {
     println("*** NEW TANK(): [" + team.getId()+":"+id+"]");
     this.id = id;
