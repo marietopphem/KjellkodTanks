@@ -11,7 +11,7 @@
 * Lagt samlingarna som Array istället för ArrayList, vilket var onödigt de har fast längd.
 * Det går nu att manuellt ta över valfri tanks, genom siffertangenterna, markör visar aktuell.
 */
-
+Grid gg;
 // för ljud
 import ddf.minim.*;
 
@@ -116,6 +116,7 @@ void setup(){
   tankInFocus = 0;
   
   savedTime = millis(); //store the current time.
+  gg = new Grid();
 }
 
 void displayHinder() {
@@ -162,7 +163,7 @@ void checkForCollisionsTanks() {
     allTanks[i].checkEnvironment();
     
     // Check for collisions with "no Smart Objects", Obstacles (trees, etc.)
-    /*for (int j = 0; j < allaHinder.length; j++) {
+    for (int j = 0; j < allaHinder.length; j++) {
       allTanks[i].checkCollision(allaHinder[j]);
     }
     
@@ -171,7 +172,7 @@ void checkForCollisionsTanks() {
       if (allTanks[i].getId() != j) {
         allTanks[i].checkCollision(allTanks[j]);
       }
-    }*/
+    }
   }
 }
 
@@ -206,7 +207,10 @@ void displayHomeBaseTeam2() {
 void draw() {
   // Kommentar: flyttat ut en del i egna funktioner istället.
   background(200);
+  
   ellipse(700,550,20,20);
+  
+  gg.display();
   
   
   int passedTime = millis() - savedTime;
@@ -238,6 +242,10 @@ void draw() {
   
   
   updateStatus();
+  for(int i = 20;i<height;i+=20)
+    line(0,i,width,i);
+  for(int i = 20;i<width;i+=20)
+    line(i,0,i,height);
 }
 
 void loadShots() {
@@ -307,7 +315,12 @@ void checkForKeys() {
        allTanks[tankInFocus].deaccelarate();
     }*/
   }
-    allTanks[tankInFocus].action();
+   for(Tank t : allTanks)
+    t.action();
+    //allTanks[tankInFocus].action();
+    //allTanks[0].action();
+    //allTanks[2].action();
+    
 }
 
 void keyPressed() {
@@ -393,5 +406,6 @@ public void keyTyped() {
   
 }
 public void mouseClicked(){
-   allTanks[tankInFocus].setGoal(new PVector(mouseX,mouseY));
+   allTanks[tankInFocus].aStarMove(new PVector(mouseX,mouseY));
+   //allTanks[tankInFocus].moveTo2();
 }

@@ -26,7 +26,7 @@ class MapHandler {
 
   MapHandler() {
 
-    testMethod();
+    createArrayList();
   }
 
 
@@ -74,7 +74,7 @@ class MapHandler {
 
 
 
-  public void testMethod() {
+ /* public void testMethod() {
 
     createArrayList();
 
@@ -89,6 +89,30 @@ class MapHandler {
         break;
       }
     }
+  }*/
+  
+  public PVector method() {
+
+    
+
+   
+
+      if (!isEmpty()) {
+        tempPos = getPosition(getRandomInt());
+
+        updateArrayLists();
+        return tempPos;
+      } else {
+        System.out.println("There are no unvisited positions! The map is explored.");
+        ArrayList<PVector> temp = unvisitedPositions;
+        unvisitedPositions = visitedPositions;
+        visitedPositions = temp;
+        
+        tempPos = getPosition(getRandomInt());
+
+        updateArrayLists();
+        return tempPos;
+      }
   }
 
   public void updateArrayLists() {
@@ -101,6 +125,7 @@ class MapHandler {
 
     unvisitedPositions.remove(tempPos);
   }
+  
 
   public int getRandomInt() {
 

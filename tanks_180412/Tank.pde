@@ -1,4 +1,11 @@
+import java.util.Collections;
+import java.util.AbstractQueue;
+import java.util.LinkedList;
 class Tank {
+  Astar a;
+  boolean crash;
+  boolean wait;
+  int waitCount;
   int id;
   int team_id;
   Team team;
@@ -18,9 +25,12 @@ class Tank {
   PVector velocity = new PVector();
   PVector acceleration = new PVector();
   PVector goal;
+  LinkedList<PVector> goals;
+  MapHandler mh;
   
   // Variable for heading!
   float heading;
+  float oldHeading;
   
   boolean moving_backward;
   boolean moving_forward;
@@ -67,7 +77,14 @@ class Tank {
     this.health = 3;// 3 är bra, 2 är mindre bra, 1 är immobilized, 0 är oskadliggjord.
     
     this.ball.setColor(this.team.getColor());
-    goal = new PVector(0,0);
+    //goal = new PVector(200,200);
+    goals = new LinkedList<PVector>();
+    mh = new MapHandler();
+    crash = false;
+    wait = false;
+    waitCount= 0;
+    goal = position;
+    
     
   }
   
@@ -232,10 +249,12 @@ class Tank {
 
     // Minimum distance before they are touching
     float minDistance = this.radius + other.radius;
+    
 
     if (distanceVectMag < minDistance) {
       println("Tank collided with Hinder, probably a Tree.");
       this.position.set(this.position_temp); // Flytta tillbaka.
+      crash = true;
       if (this.hasShot) {
         this.ball.updateLoadedPosition(this.position_temp);
       }
@@ -257,8 +276,10 @@ class Tank {
 
     if (distanceVectMag < minDistance) {
       println("Tank" + this.team.getId() + ":"+this.id + " collided with another Tank" + other.team_id + ":"+other.id);
-     
+       
       this.position.set(this.position_temp); // Flytta tillbaka.
+      other.crash = true;
+      crash = true;
       if (this.hasShot) {
         this.ball.updateLoadedPosition(this.position_temp);
       }
@@ -266,6 +287,8 @@ class Tank {
   }
   
   void display() {
+    if(a!=null)
+    a.draw();
     
     imageMode(CENTER);
     pushMatrix();
@@ -280,7 +303,7 @@ class Tank {
     fill(this.team.getColor()); 
     this.turret.display();
    
-    popMatrix();        
+    popMatrix();
         
 
   }
@@ -288,31 +311,163 @@ class Tank {
   goal = pos;
   }
   
+  
   void action(){
-  
-    moveTo(goal);
-  }
-  
-  void moveTo(PVector pos){
-    if(!(position.x-pos.x <5 && position.x-pos.x >-5 && position.y-pos.y <5 && position.y-pos.y >-5)){
-      float x = pos.x-position.x;
-      float y = pos.y-position.y;
+    if(crash == true){
+      System.out.println("tjabba");
+      PVector temp = goal;
+      goals.clear();
+      float newX = -1;
+      while (newX < 26 ||newX >774)
+      newX = position.x+(int)random(200)-100;
+      float newY = -1;
+      while (newY < 26 ||newX >774)
+      newY = position.x+(int)random(200)-100;
+      goal = new PVector(newX,newY);
       
-      float tempHeading = atan(y/x);
-      if(x<0)
-        tempHeading -= PI;
-      println(position.x +" "+ position.y);
-      println(pos.x+" "+pos.y);
-      println(heading);
-      println(tempHeading);
-      if(heading > (tempHeading+radians(1)))
-        turnLeft();
-      else if (heading < (tempHeading-radians(1)))
+      
+    }
+    /*if(crash == true){
+      System.out.println("tjenna");
+      if(oldHeading == null)
+      oldHeading = heading;
+      oldHeading += radians(140+(int)random(80);
+      else if (oldHeading - heading > radians(2))
         turnRight();
       else
-      moveForward();
+        
+      
+      crash = false;*/
+    if(wait && position.x < 150 && position.y<350){
+      if(waitCount >= 180){
+        wait = false;
+        waitCount = 0;
+        goals.clear();
+        agenda();
+      }
+      else{
+        waitCount++;
+      }
+    } 
+    else {
+      if(position.x > (width - 126) && position.y > (height-351) || position.x > (width - 151) && position.y > (height-326)) {
+      
+      goals.clear();
+      aStarMove(new PVector(100,100));
+      wait = true;
     }
+    float diffx = position.x-goal.x;
+    float diffy = position.y-goal.y;
+    if(Math.abs(diffx) <= 4 && Math.abs(diffy) <= 4 && !crash){
+      if(goals.size() > 0)
+        goal = goals.poll();
+      else
+      agenda();
+        
+      }
+      
+    else{
     
+    moveTo(goal);
+    crash = false;
+    }
+    }
+  }
+  void aStar(PVector goal){
     
+  }
+  GridSquare convertToGrid(PVector p){
+    int x = int(p.x);
+    x = x/20;
+    x = x*20;
+    int y = int(p.y);
+    y = y/20;
+    y = y*20;
+    return new GridSquare(x,y);
+    
+  }
+  void agenda(){
+    PVector goal = mh.method();
+    aStarMove(goal);
+  }
+    
+  void aStarMove(PVector p){
+    GridSquare goal = convertToGrid(p);
+    GridSquare start = convertToGrid(position);
+    
+    //GridSquare goal2 = new GridSquare(x,y);
+    a = new Astar(goal);
+    ArrayList<GridSquare> sequence = a.aStarSearch(start.x,start.y,goal);
+    Collections.reverse(sequence);
+    for(GridSquare g:sequence)
+      goals.add(new PVector(g.x,g.y));
+    
+  }
+  void moveTo2(){
+    moveTo(new PVector(200,200));
+     moveTo(new PVector(400,400));
+      moveTo(new PVector(300,500));
+       moveTo(new PVector(800,700));
+        moveTo(new PVector(400,200));
+         moveTo(new PVector(100,200));
+  }
+  /*void moveTo(PVector pos){
+    
+      float x = pos.x-position.x;
+      float y = pos.y-position.y;
+      float tempHeading = 0;
+      float tempangle = ((heading+PI/2) % (2*PI));
+      if(tempangle < (0))
+        tempangle += 2*PI;
+    if(Math.abs(x)>4 || Math.abs(y)>4){
+      tempHeading = atan(y/x)+PI/2;
+      if(x<0)
+        tempHeading += PI;
+      
+      if(tempangle > (tempHeading+radians(1)))
+        if(Math.abs(tempangle-tempHeading) < PI  || Math.abs((tempangle-2*PI)-tempHeading) < PI/8)
+        turnLeft();
+        else
+        turnRight();
+      else if (tempangle < (tempHeading-radians(1)))
+        if(Math.abs(tempHeading-tempangle) < PI || Math.abs(tempHeading-(tempangle+2*PI)) < PI/8)
+        turnRight();
+        else
+        turnLeft();
+      else
+      moveForward();
+       
+        
+    }
+     println(heading);
+         println(heading % (2*PI));
+         println(tempangle);
+        println(tempHeading);
+    
+  }*/
+  void moveTo(PVector pos){
+    
+    float x = pos.x-position.x;
+      float y = pos.y-position.y;
+      float angle = 0;
+      float tempHeading = (heading+PI/2)%(2*PI);
+      if(tempHeading < 0)
+        tempHeading += 2*PI;
+      if(Math.abs(x)>4 || Math.abs(y)>4){
+      angle = atan(y/x) +PI/2;
+      if(x<0)
+        angle += PI;
+         //println(heading);
+         //println((heading+PI/2) % (2*PI));
+         //println(tempangle);
+        //println(tempHeading);
+      if(tempHeading > (angle+radians(1)) && (tempHeading-angle) < (PI+radians(2)) || (angle-tempHeading) > (PI+radians(2)) && (angle-tempHeading) < ((2*PI)-radians(1)))
+      turnLeft();
+      else if (tempHeading < (angle-radians(1)) && (angle-tempHeading) < (PI+radians(2)) || (tempHeading - angle) > (PI+radians(2)) && (tempHeading - angle) < ((2*PI)-radians(1)))
+      turnRight();
+      else
+      moveForward();
+      }
+      
   }
 }
